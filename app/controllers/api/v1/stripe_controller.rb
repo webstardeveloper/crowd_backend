@@ -39,6 +39,20 @@ module Api
         end
       end
 
+      #webhook for sofort payments, later on change this so that it will be used by all payments
+      def webhook
+        event_json = JSON.parse(request.body.read)
+        if event_json["type"] == "charge.succeeded"
+          charge_object = event_json["data"]["object"]
+          charge_id = charge_object["id"]
+          funding_trans = FundingTransaction.find_by_charge_id(charge_id)
+          if funding_trans
+            funding_trans.charge_status = "succeeded"
+            funding_trans.save
+          end
+        end
+      end
+
       
     end
   end

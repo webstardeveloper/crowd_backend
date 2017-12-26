@@ -13,6 +13,19 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def confirm_email
+    user = User.find_by_confirm_token(params[:id])
+    if user
+      user.email_activate
+      message = "Welcome to the CrowdPouch! Your email has been confirmed. Please sign in to continue"
+    else
+      message = "Email is already confirmed or the user does not exist"
+    end
+
+    redirect_url = Rails.configuration.email_confirmation['redirect_url']
+    redirect_to "#{redirect_url}?message=#{message}"
+  end
+
   
 
 end
