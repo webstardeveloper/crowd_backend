@@ -94,6 +94,20 @@ module Api
 
       private
 
+      def find_project
+        @project = Project.find(params[:id])
+      end
+
+      def update_params
+        params.permit(
+          :video_url, :image_url, :category_id,
+          rewards_attributes: [:id, :title, :description, :image_url, :amount],
+          story_attributes: [:id, sections_attributes: [:id, :heading, :description] ],
+          faqs_attributes: [:id, :question, :answer],
+          links_attributes: [:id, :url],
+          events_attributes: [:id, :title, :country, :date, :image_url, :description]
+        )
+      end
 
     end
   end
