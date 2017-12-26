@@ -40,7 +40,37 @@ module Api
         render json: @project, status: :ok
       end
 
-     
+      def view_project_from_mail
+        id = params[:id]
+        redirect_url = Rails.configuration.email_confirmation['redirect_url']
+        redirect_to "#{redirect_url}/projects/#{id}"           
+      end
+
+      def launch
+        status = @project.launch_project
+        if status
+          @project.save
+          current_user.notifications.create(
+            subject: 'Project Launch',
+            description: 'Your project was successfully launched, we will notify you once the project is approved by the admin'
+          )
+        end
+        render json: { status: status }
+      end
+
+      def get_project_backers
+        funding_type = @project.funding_model
+        if(funding_type == "flexi")
+          render json: @project.backers, each_serializer: LiteUserSerializer 
+        else
+          backers = @project.future_donors.map do |donor|
+            User.find(donor.user_id)
+          end
+          render json: backers, each_serializer: LiteUserSerializer
+        end
+      end
+
+      
 
     end
   end
