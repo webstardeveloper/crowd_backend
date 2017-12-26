@@ -70,7 +70,30 @@ module Api
         end
       end
 
-      
+      def get_draft_project
+        project = current_user.draft_project
+        if(!project)
+          project = Project.draft(current_user)
+        end
+        render json: project, status: :ok
+      end
+
+      def destroy
+        if @project.destroy
+          render json: { message: "project deleted" }, status: :ok
+        else
+          render json: { message: "error: #{@project.errors}" }, status: :internal_server_error
+        end
+      end
+
+      def report_project
+        reason = params[:reason]
+        mail_status = UserMailer.report_project(reason, @project).deliver
+        render json: { message: "we have sent your request to the admin" }, status: :ok
+      end
+
+      private
+
 
     end
   end
