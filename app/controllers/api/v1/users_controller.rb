@@ -26,6 +26,25 @@ class Api::V1::UsersController < ApplicationController
     redirect_to "#{redirect_url}?message=#{message}"
   end
 
+  def show
+    render json: @user, status: :ok
+  end
+
+  def update_profile_pic
+    user = current_user
+    command = ImageUpload.call(params[:image_data])
+    if command.success?
+      user.image_url = command.result
+      if user.save!
+        render json: user, status: :ok
+      else
+        render json: { errors: user.errors }, status: 422
+      end
+    else
+      render json: { errors: command.errors }
+    end
+  end
+
   
 
 end
