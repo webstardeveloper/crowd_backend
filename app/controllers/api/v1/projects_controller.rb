@@ -16,7 +16,32 @@ module Api
         render json: @projects, each_serializer: LiteProjectSerializer , status: :ok
       end
 
-      
+      def create
+        result = ProjectService::CreateProject.call(params)
+        project = result[:model]
+        if result[:status]
+          render json: project, status: :created
+        else
+          render json: project.errors, status: :unprocessable_entity
+        end
+      end
+
+      def update 
+        result = ProjectService::UpdateProject.call(params)
+        project = result[:model]
+        if result[:status]
+          render json: project, status: :created
+        else
+          render json: project.errors, status: :unprocessable_entity
+        end
+      end
+
+      def show
+        render json: @project, status: :ok
+      end
+
+     
+
     end
   end
 end
