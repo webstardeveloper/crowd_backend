@@ -27,6 +27,18 @@ module Api
         end
       end
 
+      def sofort_payments
+        token = params[:stripeToken]
+        amount = params[:amount]
+        command = SofortPayment.call(token, amount, @current_user, @project, @reward) 
+        if command.success?
+          message = "Thanks for backing up this project, Your payment may take upto 14 days to confirm, we will notify you once your payment is confirmed"
+          render json: { message: message }
+        else
+          render json: { error: command.errors }
+        end
+      end
+
       
     end
   end
