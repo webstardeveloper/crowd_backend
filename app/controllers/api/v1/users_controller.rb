@@ -45,6 +45,36 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  
+  def update
+    if @user.update(user_params)
+      render json: @user, status: :ok
+    else
+      render json: { errors: @user.errors }, status: 422
+    end
+  end
+
+  def get_user_kyc_info
+    kyc = current_user.kyc
+    render json: kyc, status: :ok
+  end
+
+  def update_user_kyc_info
+    kyc = Kyc.find_or_initialize_by(id: params[:id])
+    kyc.attributes = kyc_permitted_params
+    if (params[:document_image_data])
+      command = ImageUpload.call(params[:document_image_data])
+      if command.success?
+        kyc.document_image_url = command.result
+      end
+    end
+    kyc.user_id = current_user.id
+    if kyc.save!
+      render json: { message: 'user kyc saved' }, status: :ok
+    else
+      render json: { errors: kyc.errors }, status: 422
+    end
+  end
+
+  private
 
 end
